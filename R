@@ -1,4 +1,3 @@
--- Script de ejemplo que podría estar en la URL
 local function setupUI()
     local screenGui = Instance.new("ScreenGui")
     screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -20,6 +19,49 @@ local function setupUI()
     toggleButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible  -- Alternar visibilidad
         toggleButton.Text = mainFrame.Visible and "Cerrar" or "Abrir"  -- Cambiar el texto del botón
+    end)
+
+    -- Hacer el mainFrame movible
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    -- Para mouse y PC
+    mainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+        end
+    end)
+
+    mainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+            local delta = input.Position - dragStart
+            mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    -- Para dispositivos móviles
+    mainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+        end
+    end)
+
+    mainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch and dragging then
+            local delta = input.Position - dragStart
+            mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    mainFrame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
     end)
 end
 
